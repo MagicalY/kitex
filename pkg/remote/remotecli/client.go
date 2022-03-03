@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"net"
-	"sync"
 
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/remote"
@@ -35,11 +34,12 @@ type Client interface {
 	Recycle()
 }
 
-var clientPool = &sync.Pool{
-	New: func() interface{} {
-		return new(client)
-	},
-}
+//
+//var clientPool = &sync.Pool{
+//	New: func() interface{} {
+//		return new(client)
+//	},
+//}
 
 type client struct {
 	transHdlr   remote.TransHandler
@@ -65,16 +65,16 @@ func NewClient(ctx context.Context, ri rpcinfo.RPCInfo, handler remote.TransHand
 		}
 		return nil, kerrors.ErrGetConnection.WithCause(err)
 	}
-	cli := clientPool.Get().(*client)
+	cli := new(client)
 	cli.init(handler, cm, rawConn)
 	return cli, nil
 }
 
 func (c *client) Recycle() {
-	c.transHdlr = nil
-	c.connManager = nil
-	c.conn = nil
-	clientPool.Put(c)
+	//c.transHdlr = nil
+	//c.connManager = nil
+	//c.conn = nil
+	//clientPool.Put(c)
 }
 
 func (c *client) init(handler remote.TransHandler, cm *ConnWrapper, conn net.Conn) {

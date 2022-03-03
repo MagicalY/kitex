@@ -348,7 +348,7 @@ func (kc *kClient) invokeHandleEndpoint() (endpoint.Endpoint, error) {
 			return
 		}
 
-		defer cli.Recycle()
+		//defer cli.Recycle()
 		config := ri.Config()
 		m := kc.svcInfo.MethodInfo(methodName)
 		if m.OneWay() {

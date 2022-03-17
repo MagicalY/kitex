@@ -119,6 +119,20 @@ func (p *peer) Get(d remote.Dialer, timeout time.Duration, reporter Reporter, ad
 		}
 		_ = conn.Conn.Close()
 	}
+	for i := 0; i < 9; i++ {
+		conn, err := d.DialTimeout(p.addr.Network(), p.addr.String(), timeout)
+		if err != nil {
+			reporter.ConnFailed(Long, p.serviceName, p.addr)
+			break
+		}
+		reporter.ConnSucceed(Long, p.serviceName, p.addr)
+		p.put(&longConn{
+			Conn:     conn,
+			deadline: time.Now().Add(p.maxIdleTimeout),
+			address:  addr,
+		})
+	}
+
 	conn, err := d.DialTimeout(p.addr.Network(), p.addr.String(), timeout)
 	if err != nil {
 		reporter.ConnFailed(Long, p.serviceName, p.addr)
